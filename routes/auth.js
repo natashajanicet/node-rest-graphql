@@ -16,6 +16,7 @@ router.put(
       .normalizeEmail()
       .custom((value, { req }) => {
         return User.findOne({ email: value }).then((userDoc) => {
+            console.log('userDoc', userDoc)
           if (userDoc) {
             return Promise.reject(
               'Email exist already, please pick up a different one.'

@@ -4,6 +4,7 @@ const path = require('path');
 const { validationResult } = require('express-validator');
 
 const Post = require('../models/post');
+const User = require('../models/user');
 
 exports.getPosts = (req, res, next) => {
   const currentPage = req.query.page || 1;
@@ -18,10 +19,10 @@ exports.getPosts = (req, res, next) => {
         .limit(perPageItem);
     })
     .then((posts) => {
-      res.status(200).json({ 
-        message: 'Posts fetch successfully', 
+      res.status(200).json({
+        message: 'Posts fetch successfully',
         posts,
-        totalItems
+        totalItems,
       });
     })
     .catch((err) => {
@@ -54,17 +55,30 @@ exports.createPost = (req, res, next) => {
     title,
     content,
     imageUrl,
-    creator: {
-      name: 'Creator',
-    },
+    creator: req.userId,
   });
+  let creator;
 
   post
     .save()
     .then((result) => {
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      if (!user) {
+        const error = new Error('User not found');
+        error.statusCode = 401;
+        throw error;
+      }
+      creator = user;
+      user.posts.push(post);
+      return user.save();
+    })
+    .then((result) => {
       res.status(201).json({
         message: 'Post created successfully',
-        post: result,
+        post,
+        creator: { id: creator._id, name: creator.name },
       });
     })
     .catch((err) => {

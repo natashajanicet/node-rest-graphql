@@ -7,6 +7,7 @@ const { v4: uuid } = require('uuid');
 const cors = require('cors')
 
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -37,6 +38,7 @@ app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
 app.use(cors());
 
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);

@@ -16,7 +16,6 @@ router.put(
       .normalizeEmail()
       .custom((value, { req }) => {
         return User.findOne({ email: value }).then((userDoc) => {
-            console.log('userDoc', userDoc)
           if (userDoc) {
             return Promise.reject(
               'Email exist already, please pick up a different one.'
@@ -24,15 +23,12 @@ router.put(
           }
         });
       }),
-    body('password')
-      .trim()
-      .isLength({ min: 5}),
-    body('name')
-      .trim()
-      .not()
-      .isEmpty()
+    body('password').trim().isLength({ min: 5 }),
+    body('name').trim().not().isEmpty(),
   ],
   authController.signup
 );
+
+router.post('/login', authController.login);
 
 module.exports = router;

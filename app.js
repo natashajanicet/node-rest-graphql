@@ -5,11 +5,11 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const { v4: uuid } = require('uuid');
 const cors = require('cors');
-const { Server } = require('socket.io');
 
 const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
 const { createServer } = require('http');
+const socket = require('./socket');
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -57,12 +57,7 @@ mongoose
   .connect('mongodb://0.0.0.0:27017/messages?retryWrites=true&w=majority')
   .then((result) => {
     const httpServer = createServer(app);
-    const io = new Server(httpServer, {
-      cors: {
-        origin: 'http://localhost:3000',
-        methods: ['GET', 'POST'],
-      },
-    });
+    const io = socket.init(httpServer);
     io.on('connection', (socket) => {
       console.log('client connected ', socket.id);
     });

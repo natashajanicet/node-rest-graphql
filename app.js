@@ -4,10 +4,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const { v4: uuid } = require('uuid');
-const cors = require('cors')
+const cors = require('cors');
+const { Server } = require('socket.io');
 
 const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
+const { createServer } = require('http');
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -33,7 +35,9 @@ const fileFilter = (req, file, cb) => {
 
 app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
-app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
+);
 
 app.use(cors());
 
@@ -52,7 +56,18 @@ app.use((error, req, res, next) => {
 mongoose
   .connect('mongodb://0.0.0.0:27017/messages?retryWrites=true&w=majority')
   .then((result) => {
-    app.listen(8080);
+    const httpServer = createServer(app);
+    const io = new Server(httpServer, {
+      cors: {
+        origin: 'http://localhost:3000',
+        methods: ['GET', 'POST'],
+      },
+    });
+    io.on('connection', (socket) => {
+      console.log('client connected ', socket.id);
+    });
+
+    httpServer.listen(8080);
   })
   .catch((err) => {
     console.log(err);

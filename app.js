@@ -8,8 +8,6 @@ const cors = require('cors');
 
 const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
-const { createServer } = require('http');
-const socket = require('./socket');
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -56,13 +54,7 @@ app.use((error, req, res, next) => {
 mongoose
   .connect('mongodb://0.0.0.0:27017/messages?retryWrites=true&w=majority')
   .then((result) => {
-    const httpServer = createServer(app);
-    const io = socket.init(httpServer);
-    io.on('connection', (socket) => {
-      console.log('client connected ', socket.id);
-    });
-
-    httpServer.listen(8080);
+    app.listen(8080);
   })
   .catch((err) => {
     console.log(err);

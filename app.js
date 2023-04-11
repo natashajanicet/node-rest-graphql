@@ -5,9 +5,10 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const { v4: uuid } = require('uuid');
 const cors = require('cors');
+const { graphqlHTTP } = require('express-graphql');
 
-const feedRoutes = require('./routes/feed');
-const authRoutes = require('./routes/auth');
+const graphqlResolver = require('./graphql/resolvers');
+const graphqlSchema = require('./graphql/schema');
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -39,8 +40,13 @@ app.use(
 
 app.use(cors());
 
-app.use('/feed', feedRoutes);
-app.use('/auth', authRoutes);
+app.use(
+  '/graphql',
+  graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
+  })
+);
 
 app.use((error, req, res, next) => {
   console.log(error);

@@ -45,6 +45,7 @@ app.use(
   graphqlHTTP({
     schema: graphqlSchema,
     rootValue: graphqlResolver,
+    graphiql: true // to enable graphql playground
   })
 );
 

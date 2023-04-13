@@ -9,6 +9,7 @@ const { graphqlHTTP } = require('express-graphql');
 
 const graphqlResolver = require('./graphql/resolvers');
 const graphqlSchema = require('./graphql/schema');
+const auth = require('./middleware/auth');
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -39,6 +40,8 @@ app.use(
 );
 
 app.use(cors());
+
+app.use(auth)
 
 app.use(
   '/graphql',

@@ -64,18 +64,20 @@ exports.createPost = async (req, res, next) => {
     }
 
     creator.posts.push(post);
-    await creator.save();
+    const savedUser = await creator.save();
 
     res.status(201).json({
       message: 'Post created successfully',
       post,
       creator: { id: creator._id, name: creator.name },
     });
+    return savedUser;
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
     next(err);
+    return err;
   }
 };
 

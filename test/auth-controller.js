@@ -1,9 +1,9 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
+const mongoose = require('mongoose');
 
 const User = require('../models/user');
 const AuthController = require('../controllers/auth');
-const { default: mongoose } = require('mongoose');
 
 describe('Auth Controller', function () {
   before(function (done) {
